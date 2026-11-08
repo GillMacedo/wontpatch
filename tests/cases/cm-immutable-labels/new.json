@@ -1,0 +1,14 @@
+{
+  "apiVersion": "v1",
+  "kind": "ConfigMap",
+  "metadata": {
+    "name": "cm",
+    "labels": {
+      "a": "b"
+    }
+  },
+  "data": {
+    "a": "1"
+  },
+  "immutable": true
+}

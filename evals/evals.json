@@ -1,0 +1,29 @@
+[
+  {
+    "skills": ["checking-immutable-fields"],
+    "query": "Will upgrading our Helm release from chart 3.4.0 to 4.0.0 work? The release is called demo in namespace monitoring.",
+    "expected_behavior": [
+      "Gets OLD from helm get manifest or helm template of the old version, and NEW from helm template of the new one, with the same release name and namespace",
+      "Runs wontpatch with --namespace monitoring and reads the exit code first",
+      "Names each object and field it reports as an error, with the fix line",
+      "Doesn't delete anything in the cluster without being asked"
+    ]
+  },
+  {
+    "skills": ["checking-immutable-fields"],
+    "query": "helm upgrade failed with: cannot patch \"db\" with kind StatefulSet: spec.volumeClaimTemplates: field is immutable. What do I do?",
+    "expected_behavior": [
+      "Explains that volumeClaimTemplates can't change on an existing StatefulSet",
+      "Uses helm history and helm get manifest --revision of the last deployed revision as OLD, not the failed one",
+      "Suggests kubectl delete statefulset db --cascade=orphan and says the pods and claims stay"
+    ]
+  },
+  {
+    "skills": ["checking-immutable-fields"],
+    "query": "wontpatch exited 2 on our manifests. Does that mean nothing changed?",
+    "expected_behavior": [
+      "Says exit 2 means nothing was compared",
+      "Explains the reason from the message, such as an empty or failed render or a cut-off file"
+    ]
+  }
+]

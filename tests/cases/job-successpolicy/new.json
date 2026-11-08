@@ -1,0 +1,30 @@
+{
+  "apiVersion": "batch/v1",
+  "kind": "Job",
+  "metadata": {
+    "name": "migrate"
+  },
+  "spec": {
+    "template": {
+      "spec": {
+        "restartPolicy": "Never",
+        "containers": [
+          {
+            "name": "c",
+            "image": "nginx:1.27"
+          }
+        ]
+      }
+    },
+    "completionMode": "Indexed",
+    "completions": 2,
+    "parallelism": 2,
+    "successPolicy": {
+      "rules": [
+        {
+          "succeededCount": 1
+        }
+      ]
+    }
+  }
+}

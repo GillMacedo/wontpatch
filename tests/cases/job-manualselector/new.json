@@ -1,0 +1,31 @@
+{
+  "apiVersion": "batch/v1",
+  "kind": "Job",
+  "metadata": {
+    "name": "migrate"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "labels": {
+          "a": "b"
+        }
+      },
+      "spec": {
+        "restartPolicy": "Never",
+        "containers": [
+          {
+            "name": "c",
+            "image": "nginx:1.27"
+          }
+        ]
+      }
+    },
+    "manualSelector": true,
+    "selector": {
+      "matchLabels": {
+        "a": "b"
+      }
+    }
+  }
+}

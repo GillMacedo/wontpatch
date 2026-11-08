@@ -1,0 +1,12 @@
+apiVersion: storage.k8s.io/v1
+kind: CSIDriver
+metadata:
+  name: d@R@.example.com
+spec:
+  attachRequired: true
+  storageCapacity: true
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tail

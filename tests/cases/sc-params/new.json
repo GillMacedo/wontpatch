@@ -1,0 +1,11 @@
+{
+  "apiVersion": "storage.k8s.io/v1",
+  "kind": "StorageClass",
+  "metadata": {
+    "name": "{{name}}"
+  },
+  "provisioner": "example.com/a",
+  "parameters": {
+    "x": "2"
+  }
+}

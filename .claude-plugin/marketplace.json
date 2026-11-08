@@ -1,0 +1,14 @@
+{
+  "name": "wontpatch-marketplace",
+  "description": "Marketplace for wontpatch, which finds Kubernetes manifest changes that helm upgrade and kubectl apply reject as immutable.",
+  "owner": {
+    "name": "Giulliano Macedo"
+  },
+  "plugins": [
+    {
+      "name": "wontpatch",
+      "source": "./plugin",
+      "description": "Find Kubernetes manifest changes that helm upgrade and kubectl apply reject with field is immutable, before you deploy."
+    }
+  ]
+}

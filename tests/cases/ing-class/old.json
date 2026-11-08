@@ -1,0 +1,17 @@
+{
+  "apiVersion": "networking.k8s.io/v1",
+  "kind": "Ingress",
+  "metadata": {
+    "name": "i"
+  },
+  "spec": {
+    "defaultBackend": {
+      "service": {
+        "name": "a",
+        "port": {
+          "number": 80
+        }
+      }
+    }
+  }
+}

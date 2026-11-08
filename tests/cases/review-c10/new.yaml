@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: j
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: c
+        image: Busybox
+        imagePullPolicy: Always
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sa

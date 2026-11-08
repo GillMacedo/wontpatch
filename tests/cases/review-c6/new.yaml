@@ -1,0 +1,13 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: sc-@R@
+provisioner: example.com/x
+parameters:
+  type: gp2
+  extra: ""
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sa

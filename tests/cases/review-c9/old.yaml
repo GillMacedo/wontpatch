@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: j
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: c
+        image: busybox:1.36
+      volumes:
+      - name: v
+        csi: {driver: x.example.com}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sa

@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: j
+spec:
+  template:
+    metadata:
+      labels:
+        job-name: j
+        batch.kubernetes.io/job-name: j
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: c
+        image: busybox:1.36
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sa

@@ -1,0 +1,12 @@
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: i@R@
+spec:
+  controller: example.com/a
+  parameters: {apiGroup: example.com, kind: P, name: x}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tail

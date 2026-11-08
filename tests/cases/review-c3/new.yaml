@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm
+immutable: true
+data:
+  a: "1"
+  b: ""
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sa

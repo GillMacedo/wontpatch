@@ -1,0 +1,91 @@
+{
+  "apiVersion": "batch/v1",
+  "kind": "Job",
+  "metadata": {
+    "name": "migrate"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "creationTimestamp": null
+      },
+      "spec": {
+        "restartPolicy": "Never",
+        "serviceAccountName": "default",
+        "serviceAccount": "default",
+        "dnsPolicy": "ClusterFirst",
+        "schedulerName": "default-scheduler",
+        "terminationGracePeriodSeconds": 30,
+        "hostNetwork": false,
+        "securityContext": {},
+        "containers": [
+          {
+            "name": "c",
+            "image": "nginx:latest",
+            "imagePullPolicy": "Always",
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "ports": [
+              {
+                "containerPort": 8080,
+                "protocol": "TCP"
+              }
+            ],
+            "resources": {
+              "limits": {
+                "cpu": "0.5",
+                "memory": "128Mi"
+              }
+            },
+            "env": [
+              {
+                "name": "POD",
+                "valueFrom": {
+                  "fieldRef": {
+                    "apiVersion": "v1",
+                    "fieldPath": "metadata.name"
+                  }
+                }
+              }
+            ],
+            "readinessProbe": {
+              "httpGet": {
+                "path": "/healthz",
+                "port": 8080,
+                "scheme": "HTTP"
+              },
+              "timeoutSeconds": 1,
+              "periodSeconds": 10,
+              "successThreshold": 1,
+              "failureThreshold": 3
+            },
+            "volumeMounts": [
+              {
+                "name": "cfg",
+                "mountPath": "/cfg",
+                "readOnly": false
+              },
+              {
+                "name": "tmp",
+                "mountPath": "/tmp"
+              }
+            ]
+          }
+        ],
+        "volumes": [
+          {
+            "name": "cfg",
+            "configMap": {
+              "name": "x",
+              "defaultMode": 420
+            }
+          },
+          {
+            "name": "tmp",
+            "emptyDir": {}
+          }
+        ]
+      }
+    }
+  }
+}

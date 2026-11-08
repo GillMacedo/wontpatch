@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: j
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: c
+        image: busybox:1.36
+        env:
+        - name: X
+          valueFrom: {resourceFieldRef: {resource: limits.cpu, divisor: "0"}}
+        livenessProbe: {httpGet: {port: 80, path: /}}
+        lifecycle:
+          postStart: {httpGet: {port: 80, path: /}}
+      volumes:
+      - name: p
+        projected:
+          sources:
+          - serviceAccountToken: {path: t, expirationSeconds: 3600}
+      - name: e
+        ephemeral:
+          volumeClaimTemplate:
+            spec:
+              accessModes: [ReadWriteOnce]
+              volumeMode: Filesystem
+              resources: {requests: {storage: 1Gi}}
+      - name: img
+        image: {reference: busybox:1.36, pullPolicy: IfNotPresent}
+      - name: s
+        iscsi: {targetPortal: "1.2.3.4:3260", iqn: "iqn.2001-04.com.example:storage", lun: 0, iscsiInterface: default}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sa

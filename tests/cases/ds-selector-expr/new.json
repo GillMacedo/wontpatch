@@ -1,0 +1,38 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "DaemonSet",
+  "metadata": {
+    "name": "ds"
+  },
+  "spec": {
+    "selector": {
+      "matchLabels": {
+        "app": "d"
+      },
+      "matchExpressions": [
+        {
+          "key": "app",
+          "operator": "In",
+          "values": [
+            "d"
+          ]
+        }
+      ]
+    },
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "d"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "c",
+            "image": "nginx:1.27"
+          }
+        ]
+      }
+    }
+  }
+}
