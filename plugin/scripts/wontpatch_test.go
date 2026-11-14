@@ -591,3 +591,92 @@ func TestVersion(t *testing.T) {
 		t.Errorf("exit %d, %q", code, out)
 	}
 }
+
+// normPodTemplate fills in the API-server defaults so a manifest that leaves
+// them out compares equal to one that spells them out. The in-tree volume
+// sources were missing, which made a pasted `kubectl get -o yaml` look like a
+// change.
+func TestNormPodTemplateFillsInTreeVolumeDefaults(t *testing.T) {
+	in := map[string]any{
+		"spec": map[string]any{
+			"volumes": []any{
+				map[string]any{"name": "rbd", "rbd": map[string]any{"image": "pool/image"}},
+				map[string]any{"name": "sio", "scaleIO": map[string]any{"gateway": "https://sio", "system": "sio"}},
+				map[string]any{"name": "disk", "azureDisk": map[string]any{"diskName": "d", "diskURI": "https://d"}},
+			},
+		},
+	}
+
+	out, ok := normPodTemplate(in).(map[string]any)
+	if !ok {
+		t.Fatal("normPodTemplate did not return a map")
+	}
+	vols, _ := out["spec"].(map[string]any)["volumes"].([]any)
+	byName := map[string]map[string]any{}
+	for _, v := range vols {
+		vm, _ := v.(map[string]any)
+		name, _ := vm["name"].(string)
+		byName[name] = vm
+	}
+
+	for _, tc := range []struct{ volume, source, field, want string }{
+		{"rbd", "rbd", "pool", "rbd"},
+		{"rbd", "rbd", "user", "admin"},
+		{"rbd", "rbd", "keyring", "/etc/ceph/keyring"},
+		{"sio", "scaleIO", "fsType", "xfs"},
+		{"sio", "scaleIO", "storageMode", "ThinProvisioned"},
+		{"disk", "azureDisk", "cachingMode", "ReadWrite"},
+		{"disk", "azureDisk", "fsType", "ext4"},
+		{"disk", "azureDisk", "kind", "Shared"},
+	} {
+		vol, ok := byName[tc.volume]
+		if !ok {
+			t.Fatalf("volume %s missing from the normalized template", tc.volume)
+		}
+		src, ok := vol[tc.source].(map[string]any)
+		if !ok {
+			t.Fatalf("volume %s has no %s source", tc.volume, tc.source)
+		}
+		if got := src[tc.field]; got != tc.want {
+			t.Errorf("%s.%s.%s = %v, want %v", tc.volume, tc.source, tc.field, got, tc.want)
+		}
+	}
+}
+
+// A value the user set must survive the normalization.
+func TestNormPodTemplateKeepsExplicitVolumeDefaults(t *testing.T) {
+	in := map[string]any{
+		"spec": map[string]any{
+			"volumes": []any{
+				map[string]any{"name": "rbd", "rbd": map[string]any{
+					"image": "pool/image", "pool": "custom-pool", "user": "ceph", "keyring": "/other/keyring",
+				}},
+				map[string]any{"name": "disk", "azureDisk": map[string]any{
+					"diskName": "d", "diskURI": "https://d", "kind": "Managed", "fsType": "xfs",
+				}},
+			},
+		},
+	}
+
+	out, _ := normPodTemplate(in).(map[string]any)
+	vols, _ := out["spec"].(map[string]any)["volumes"].([]any)
+	byName := map[string]map[string]any{}
+	for _, v := range vols {
+		vm, _ := v.(map[string]any)
+		name, _ := vm["name"].(string)
+		byName[name] = vm
+	}
+
+	rbd, _ := byName["rbd"]["rbd"].(map[string]any)
+	for field, want := range map[string]string{"pool": "custom-pool", "user": "ceph", "keyring": "/other/keyring"} {
+		if got := rbd[field]; got != want {
+			t.Errorf("rbd.%s overwritten: got %v, want %v", field, got, want)
+		}
+	}
+	disk, _ := byName["disk"]["azureDisk"].(map[string]any)
+	for field, want := range map[string]string{"kind": "Managed", "fsType": "xfs", "cachingMode": "ReadWrite"} {
+		if got := disk[field]; got != want {
+			t.Errorf("azureDisk.%s = %v, want %v", field, got, want)
+		}
+	}
+}

@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: j@R@
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: c
+        image: busybox:1.36
+      volumes:
+      - name: v
+        azureDisk:
+          diskName: d
+          diskURI: https://d
+          cachingMode: ReadWrite
+          fsType: ext4
+          kind: Shared
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tail

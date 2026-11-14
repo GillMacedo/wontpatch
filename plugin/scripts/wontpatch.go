@@ -1759,6 +1759,20 @@ func normPodTemplate(t any) any {
 			if is, ok := vm["iscsi"].(map[string]any); ok {
 				setDefault(is, "iscsiInterface", "default")
 			}
+			if rb, ok := vm["rbd"].(map[string]any); ok {
+				setDefault(rb, "pool", "rbd")
+				setDefault(rb, "user", "admin")
+				setDefault(rb, "keyring", "/etc/ceph/keyring")
+			}
+			if si, ok := vm["scaleIO"].(map[string]any); ok {
+				setDefault(si, "fsType", "xfs")
+				setDefault(si, "storageMode", "ThinProvisioned")
+			}
+			if ad, ok := vm["azureDisk"].(map[string]any); ok {
+				setDefault(ad, "cachingMode", "ReadWrite")
+				setDefault(ad, "fsType", "ext4")
+				setDefault(ad, "kind", "Shared")
+			}
 		}
 	}
 	dropFalse(spec)
